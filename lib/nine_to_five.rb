@@ -17,15 +17,19 @@ module NineToFive
     end
 
     def call(env)
-      current_time = Time.current
-      start_time = current_time.change(hour: NineToFive.start_hour)
-      end_time = current_time.change(hour: NineToFive.end_hour)
-
-      if current_time.between? start_time, end_time
+      if during_business_hours?
         @app.call(env)
       else
         [403, {"Content-Type" => "text/html"}, [NineToFive.response]]
       end
+    end
+
+    def during_business_hours?
+      current_time = Time.current
+      start_time = current_time.change(hour: NineToFive.start_hour)
+      end_time = current_time.change(hour: NineToFive.end_hour)
+
+      current_time.between? start_time, end_time
     end
   end
 end
